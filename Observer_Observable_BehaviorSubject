@@ -1,0 +1,52 @@
+**Logservice Service**
+import { BehaviorSubject } from "rxjs";
+import { Observable } from "rxjs";
+import { of } from "rxjs";
+
+  private logSource = new BehaviorSubject<Log>({id:null, text:null, date:null});
+  selectedLog = this.logSource.asObservable();
+  
+  setFormLog(log:Log){
+    this.logSource.next(log);
+  }
+
+  getLogs(): Observable<Log[]> {
+    return of<Log[]>(this.logs);
+  }
+
+** Observable component **
+  onSelect(log:Log){
+    this._logService.setFormLog(log);
+  }
+
+** Observable html **
+        <a (click)="onSelect(log)" href='#'>{{ log.text }}</a>
+        
+** Observer ts **
+ id: string;
+  text:string;
+  date: any;
+  
+  ngOnInit(): void {
+
+    //Subscribe to observable
+    this._logService.selectedLog.subscribe( log =>{
+      if(log.id !== null){
+        this.id = log.id;
+        this.text = log.text;
+        this.date = log.date;
+        this.isNew = false;
+      }
+    })
+  }
+
+** Observer html **
+<div class="card card-body mb-3">
+    <form (ngSubmit)="onSubmit()">
+        <div class="form-group">
+            <input type="text" name="text"  class="form-control" [(ngModel)]="text" placeholder="Add a log..." >
+        </div>
+        <input type="submit" value="Add Post" class="btn btn-light" [disabled]="!this.text">
+        <button class="btn btn-warning" [hidden]="!this.text">Clear</button>
+    </form>
+</div>
